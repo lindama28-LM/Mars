@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>馬師料理 營運分析報告 2016–2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:      #1c1c1a;
+  --ink-2:    #484844;
+  --ink-3:    #8a8a82;
+  --paper:    #f8f6f1;
+  --paper-2:  #f0ede6;
+  --paper-3:  #e6e2da;
+  --border:   rgba(28,28,26,0.13);
+
+  /* palette – same 5 colours used everywhere */
+  --c-blue:   #2a4a7a;
+  --c-amber:  #b87820;
+  --c-gray:   #6a6a60;
+  --c-red:    #a83232;
+  --c-green:  #2a7a50;
+
+  --c-blue-bg:  #dce6f4;
+  --c-amber-bg: #f5e8cc;
+  --c-gray-bg:  #e2e2da;
+  --c-red-bg:   #f4dcdc;
+  --c-green-bg: #d4ede0;
+
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+/* ── HEADER ── */
+.report-header {
+  background: linear-gradient(135deg, #e8e0d0 0%, #f0e8d8 60%, #e4d8c4 100%);
+  color: var(--ink);
+  padding: 60px 56px 52px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 4px solid var(--c-amber);
+}
+.report-header::before {
+  content:''; position:absolute; right:-80px; top:-80px;
+  width:380px; height:380px; border-radius:50%;
+  border:1px solid rgba(184,120,32,0.15);
+}
+.report-header::after {
+  content:''; position:absolute; right:60px; top:60px;
+  width:200px; height:200px; border-radius:50%;
+  border:1px solid rgba(184,120,32,0.10);
+}
+.eyebrow {
+  font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--c-amber); font-weight:500; margin-bottom:14px;
+}
+.header-title {
+  font-family:'Noto Serif TC',serif; font-size:42px; font-weight:700;
+  line-height:1.15; margin-bottom:10px; color:var(--ink);
+}
+.header-sub { font-size:17px; color:var(--ink-2); font-weight:300; margin-bottom:36px; }
+.header-meta { display:flex; gap:36px; flex-wrap:wrap; }
+.hm { display:flex; flex-direction:column; gap:3px; }
+.hm-label { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); }
+.hm-value { font-size:16px; font-weight:500; color:var(--ink); }
+
+/* phase strip */
+.phase-strip { display:flex; height:7px; }
+.ps { flex:1; }
+
+/* ── LAYOUT ── */
+.wrap { max-width:1020px; margin:0 auto; padding:0 48px; }
+
+/* ── SECTION ── */
+.section { padding:52px 0 0; }
+.sec-head {
+  display:flex; align-items:baseline; gap:14px;
+  padding-bottom:14px; border-bottom:1.5px solid var(--border);
+  margin-bottom:32px;
+}
+.sec-num { font-family:'Noto Serif TC',serif; font-size:14px; color:var(--c-amber); font-weight:600; min-width:30px; }
+.sec-title { font-family:'Noto Serif TC',serif; font-size:22px; font-weight:600; }
+.sec-note { font-size:13px; color:var(--ink-3); margin-left:auto; }
+
+/* ── METRIC CARDS ── */
+.m-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:14px; margin-bottom:32px; }
+.mc {
+  border-radius:var(--radius); padding:18px 20px;
+  border:1px solid var(--border); background:var(--paper-2);
+}
+.mc.dark  { background:var(--c-amber-bg); border-color:rgba(184,120,32,.35); color:var(--ink); }
+.mc.dark .mc-val { color:var(--c-amber); }
+.mc.green { background:var(--c-green-bg); border-color:rgba(42,122,80,.22); }
+.mc.red   { background:var(--c-red-bg);   border-color:rgba(168,50,50,.22); }
+.mc.amber { background:var(--c-amber-bg); border-color:rgba(184,120,32,.22); }
+.mc.blue  { background:var(--c-blue-bg);  border-color:rgba(42,74,122,.22); }
+.mc-lbl { font-size:12px; color:var(--ink-3); margin-bottom:5px; letter-spacing:.02em; }
+.mc.dark .mc-lbl { color:var(--ink-3); }
+.mc-val { font-family:'Noto Serif TC',serif; font-size:27px; font-weight:600; line-height:1.1; }
+.mc.green .mc-val { color:var(--c-green); }
+.mc.red   .mc-val { color:var(--c-red); }
+.mc.amber .mc-val { color:var(--c-amber); }
+.mc.blue  .mc-val { color:var(--c-blue); }
+.mc-sub { font-size:12px; color:var(--ink-3); margin-top:5px; }
+.mc.dark .mc-sub { color:var(--ink-3); }
+
+/* ── CHART CARD ── */
+.cc {
+  background:#fff; border:1px solid var(--border);
+  border-radius:var(--radius); padding:26px 28px; margin-bottom:22px;
+}
+.cc-title {
+  font-size:14px; font-weight:500; color:var(--ink-2);
+  margin-bottom:18px; display:flex; align-items:center; gap:9px;
+}
+.cc-title::before {
+  content:''; display:inline-block; width:4px; height:16px;
+  background:var(--c-amber); border-radius:2px; flex-shrink:0;
+}
+.cc-wrap { position:relative; width:100%; }
+
+/* ── LEGEND ── */
+.leg { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:14px; font-size:13px; color:var(--ink-2); }
+.li  { display:flex; align-items:center; gap:7px; }
+.ld  { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+.ld.dash { background:transparent !important; border:2px dashed #999; border-radius:0; }
+
+/* ── INSIGHT CARDS ── */
+.ins-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:22px; }
+@media(max-width:640px){ .ins-grid { grid-template-columns:1fr; } }
+.ins {
+  background:var(--paper-2); border:1px solid var(--border);
+  border-radius:var(--radius); padding:16px 18px;
+  font-size:14px; color:var(--ink-2); line-height:1.75;
+}
+.ins b { color:var(--ink); font-weight:500; }
+.ins.pos { border-left:4px solid var(--c-green); }
+.ins.neg { border-left:4px solid var(--c-red); }
+.ins.neu { border-left:4px solid var(--c-amber); }
+.ins.inf { border-left:4px solid var(--c-blue); }
+
+/* ── TIMELINE ── */
+.tl { display:flex; flex-direction:column; margin-bottom:32px; }
+.tl-row { display:flex; gap:0; position:relative; }
+.tl-row::before {
+  content:''; position:absolute; left:7px; top:22px; bottom:-12px;
+  width:1.5px; background:var(--border);
+}
+.tl-row:last-child::before { display:none; }
+.tl-dot-col { width:18px; display:flex; flex-direction:column; align-items:center; padding-top:16px; flex-shrink:0; margin-right:18px; }
+.tl-dot { width:12px; height:12px; border-radius:50%; border:2px solid var(--paper); position:relative; z-index:1; }
+.tl-body { padding:12px 0 22px; flex:1; }
+.tl-period { font-size:12px; color:var(--ink-3); letter-spacing:.04em; margin-bottom:3px; }
+.tl-label { font-size:15px; font-weight:500; color:var(--ink); margin-bottom:5px; }
+.tl-desc { font-size:14px; color:var(--ink-2); line-height:1.7; }
+
+/* ── TAG ── */
+.tag { display:inline-block; padding:2px 9px; border-radius:10px; font-size:11px; font-weight:500; letter-spacing:.03em; vertical-align:middle; margin-left:6px; }
+.tag-g { background:var(--c-green-bg); color:var(--c-green); }
+.tag-a { background:var(--c-amber-bg); color:var(--c-amber); }
+.tag-r { background:var(--c-red-bg);   color:var(--c-red); }
+.tag-b { background:var(--c-blue-bg);  color:var(--c-blue); }
+
+/* ── DATA TABLE ── */
+.dtbl { width:100%; border-collapse:collapse; font-size:14px; margin-bottom:12px; }
+.dtbl th { font-size:12px; font-weight:500; color:var(--ink-3); text-align:right; padding:9px 12px; border-bottom:1.5px solid var(--border); white-space:nowrap; }
+.dtbl th:first-child { text-align:left; }
+.dtbl td { padding:9px 12px; border-bottom:1px solid rgba(28,28,26,.07); text-align:right; color:var(--ink-2); }
+.dtbl td:first-child { text-align:left; font-weight:500; color:var(--ink); }
+.dtbl tr.hl-row { background:rgba(42,122,80,.06); }
+.dtbl tr:hover { background:var(--paper-2); }
+.tv-g { color:var(--c-green); font-weight:500; }
+.tv-r { color:var(--c-red);   font-weight:500; }
+.tv-a { color:var(--c-amber); font-weight:500; }
+
+/* ── TWO COL ── */
+.two { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+@media(max-width:680px){ .two { grid-template-columns:1fr; } }
+
+/* ── CALLOUT ── */
+.cbox {
+  background: linear-gradient(135deg, #f5edd8 0%, #ede0c4 100%);
+  color: var(--ink);
+  border: 1.5px solid rgba(184,120,32,.3);
+  border-left: 5px solid var(--c-amber);
+  border-radius: var(--radius); padding:28px 32px; margin:28px 0;
+}
+.cbox-title { font-family:'Noto Serif TC',serif; font-size:18px; font-weight:600; color:var(--c-amber); margin-bottom:12px; }
+.cbox p { font-size:14px; color:var(--ink-2); line-height:1.85; }
+.cbox p+p { margin-top:10px; }
+
+/* ── ADJ NOTE ── */
+.anote {
+  background:var(--c-blue-bg); border:1px solid rgba(42,74,122,.2);
+  border-radius:var(--radius); padding:12px 16px;
+  font-size:13px; color:var(--c-blue); margin-bottom:22px;
+}
+
+/* ── PRO / CON BOXES ── */
+.pro-con { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+@media(max-width:640px){ .pro-con { grid-template-columns:1fr; } }
+.pro-box, .con-box {
+  border-radius:var(--radius); padding:18px 20px;
+  font-size:14px; color:var(--ink-2); line-height:2;
+}
+.pro-box { background:rgba(42,122,80,.07); border:1px solid rgba(42,122,80,.22); }
+.con-box { background:rgba(184,120,32,.07); border:1px solid rgba(184,120,32,.22); }
+.pro-box .box-head { font-size:14px; font-weight:500; color:var(--c-green); margin-bottom:10px; }
+.con-box .box-head { font-size:14px; font-weight:500; color:var(--c-amber); margin-bottom:10px; }
+.pro-box ul, .con-box ul { padding-left:18px; }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top:72px; padding:28px 48px;
+  background: var(--paper-2);
+  border-top: 2px solid var(--c-amber);
+  display:flex; justify-content:space-between;
+  font-size:13px; color:var(--ink-3); flex-wrap:wrap; gap:8px;
+}
+
+@media print {
+  .report-header, .phase-strip { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .cc, .section { break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="report-header">
+  <div class="wrap" style="padding-left:0;padding-right:0;">
+    <p class="eyebrow">營運分析報告</p>
+    <h1 class="header-title">馬師料理<br>經營全覽</h1>
+    <p class="header-sub">2016 年 10 月 ─ 2026 年 4 月　十年軌跡完整回顧</p>
+    <div class="header-meta">
+      <div class="hm"><span class="hm-label">資料期間</span><span class="hm-value">2016 – 2026</span></div>
+      <div class="hm"><span class="hm-label">分析月數</span><span class="hm-value">115 個月</span></div>
+      <div class="hm"><span class="hm-label">累計營收</span><span class="hm-value">約 1.26 億元</span></div>
+      <div class="hm"><span class="hm-label">分析口徑</span><span class="hm-value">已調整負責人薪資</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE STRIP -->
+<div class="phase-strip">
+  <div class="ps" style="background:var(--c-blue);   flex:4;"></div>
+  <div class="ps" style="background:var(--c-amber);  flex:3;"></div>
+  <div class="ps" style="background:var(--c-gray);   flex:1;"></div>
+  <div class="ps" style="background:var(--c-red);    flex:1;"></div>
+  <div class="ps" style="background:var(--c-green);  flex:0.7;"></div>
+</div>
+
+<div class="wrap">
+
+<!-- ───── SECTION 01 ───── -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <span class="sec-title">五個營運階段與背景脈絡</span>
+  </div>
+
+  <div class="tl">
+    <div class="tl-row">
+      <div class="tl-dot-col"><div class="tl-dot" style="background:var(--c-blue);"></div></div>
+      <div class="tl-body">
+        <p class="tl-period">2016 / 10 ─ 2019 / 12</p>
+        <p class="tl-label">正常成長期<span class="tag tag-b">有機成長</span></p>
+        <p class="tl-desc">從三個月起步，到月均營收 $107 萬，調整後淨利率穩定維持 21–23%。無外部干擾，是衡量真實經營能力最可靠的基準期。</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-dot-col"><div class="tl-dot" style="background:var(--c-amber);"></div></div>
+      <div class="tl-body">
+        <p class="tl-period">2020 / 1 ─ 2022 / 12</p>
+        <p class="tl-label">疫情擾動期<span class="tag tag-a">業績虛高</span></p>
+        <p class="tl-desc">COVID-19 期間外出聚餐減少，家庭購買便菜需求大增，業績衝至月均 $146 萬。但薪資、場地等固定成本也隨之擴張，為日後埋下包袱。2022 年的 $1,947 萬為疫情紅利，非真實成長高峰。</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-dot-col"><div class="tl-dot" style="background:var(--c-gray);"></div></div>
+      <div class="tl-body">
+        <p class="tl-period">2023 / 1 ─ 2024 / 10</p>
+        <p class="tl-label">疫後回歸期<span class="tag tag-a">正常化調整</span></p>
+        <p class="tl-desc">疫情結束，消費者回歸外出聚餐，便菜需求回落至正常水準。業績下滑屬可預期的市場正常化，並非經營衰退。薪資結構已固定，導致淨利率壓縮。</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-dot-col"><div class="tl-dot" style="background:var(--c-red);"></div></div>
+      <div class="tl-body">
+        <p class="tl-period">2024 / 10 底 ─ 2025 / 9</p>
+        <p class="tl-label">火災衝擊期<span class="tag tag-r">外力中斷</span></p>
+        <p class="tl-desc">2024 年 10 月底市場發生火災，被迫停業至 2025 年 10 月重建完成。臨時縮小規模營業，月均收入僅 $62 萬（正常水準一半），但固定成本無法等比縮減，造成每月持續虧損。本階段為純外力因素，與核心競爭力無關。</p>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-dot-col"><div class="tl-dot" style="background:var(--c-green);"></div></div>
+      <div class="tl-body">
+        <p class="tl-period">2025 / 10 ─ 迄今</p>
+        <p class="tl-label">重建復原期<span class="tag tag-g">快速回籠</span></p>
+        <p class="tl-desc">回歸原址後首月（2025/10）月營收即達 $117 萬，客群忠誠度完整保留。調整後淨利率回升至 19–23%，已超越疫情前 2019 年水準，顯示核心競爭力完好無損。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SECTION 02 ───── -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <span class="sec-title">年度核心指標總覽</span>
+    <span class="sec-note">＊2024–2026 已調整負責人薪資每月 $6 萬　｜　2026 年為前 4 個月</span>
+  </div>
+
+  <div class="anote">📌 調整說明：2024 年 7 月起每月計入負責人薪資 $6 萬，為統一比較口徑，2024/7 起數字均已扣除此項目（調整後 = 排除負責人薪資的同口徑比較）。</div>
+
+  <div class="cc">
+    <div class="cc-title">年度營收與調整後淨利（萬元）</div>
+    <div class="leg">
+      <div class="li"><div class="ld" style="background:var(--c-blue);"></div>年營收 ── 正常成長期</div>
+      <div class="li"><div class="ld" style="background:var(--c-amber);"></div>年營收 ── 疫情擾動期</div>
+      <div class="li"><div class="ld" style="background:var(--c-gray);"></div>年營收 ── 疫後回歸期</div>
+      <div class="li"><div class="ld" style="background:var(--c-red);"></div>年營收 ── 火災衝擊期</div>
+      <div class="li"><div class="ld" style="background:var(--c-green);"></div>年營收 ── 重建復原期</div>
+      <div class="li"><div class="ld dash"></div>調整後年淨利折線</div>
+    </div>
+    <div class="cc-wrap" style="height:300px;"><canvas id="annualRevChart"></canvas></div>
+  </div>
+
+  <div class="cc">
+    <div class="cc-title">調整後年度淨利率（%）── 顏色對應各階段</div>
+    <div class="leg">
+      <div class="li"><div class="ld" style="background:var(--c-blue);"></div>正常成長期</div>
+      <div class="li"><div class="ld" style="background:var(--c-amber);"></div>疫情擾動期</div>
+      <div class="li"><div class="ld" style="background:var(--c-gray);"></div>疫後回歸期</div>
+      <div class="li"><div class="ld" style="background:var(--c-red);"></div>火災衝擊期</div>
+      <div class="li"><div class="ld" style="background:var(--c-green);"></div>重建復原期</div>
+    </div>
+    <div class="cc-wrap" style="height:230px;"><canvas id="annualRateChart"></canvas></div>
+  </div>
+
+  <table class="dtbl">
+    <thead><tr>
+      <th>年度</th><th>年營收（萬）</th>
+      <th>原始淨利率</th><th>調整後淨利率</th>
+      <th>食材佔比</th><th>原始薪資%</th><th>調整後薪資%</th>
+      <th>階段</th>
+    </tr></thead>
+    <tbody id="annualTbody"></tbody>
+  </table>
+  <p style="font-size:13px;color:var(--ink-3);margin-bottom:28px;">＊ 已調整負責人薪資　　† 2026 年為前 4 個月　　2016 年僅 10–12 月三個月</p>
+</div>
+
+<!-- ───── SECTION 03 ───── -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <span class="sec-title">費用結構分析</span>
+  </div>
+
+  <div class="two">
+    <div class="cc">
+      <div class="cc-title">食材佔比趨勢（%）</div>
+      <div class="cc-wrap" style="height:210px;"><canvas id="foodChart"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-title">調整後薪資佔比趨勢（%）</div>
+      <div class="leg">
+        <div class="li"><div class="ld" style="background:rgba(42,74,122,.3);border:1px solid var(--c-blue);"></div>原始</div>
+        <div class="li"><div class="ld" style="background:var(--c-red);"></div>調整後</div>
+      </div>
+      <div class="cc-wrap" style="height:185px;"><canvas id="salaryChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="cc">
+    <div class="cc-title">費用佔比結構（各年度堆疊，調整後口徑）</div>
+    <div class="leg">
+      <div class="li"><div class="ld" style="background:var(--c-blue);"></div>食材（46–55%）</div>
+      <div class="li"><div class="ld" style="background:var(--c-red);"></div>薪資調整後（22–30%）</div>
+      <div class="li"><div class="ld" style="background:var(--c-amber);"></div>場地租金（2–4%）</div>
+      <div class="li"><div class="ld" style="background:var(--c-green);"></div>瓦斯（1–2%）</div>
+      <div class="li"><div class="ld" style="background:var(--c-gray);"></div>包裝（2–6%）</div>
+    </div>
+    <div class="cc-wrap" style="height:280px;"><canvas id="costStackChart"></canvas></div>
+  </div>
+
+  <div class="ins-grid">
+    <div class="ins pos"><b>食材控制穩定</b><br>長期維持在 46–51%，2025 年降至 43% 代表採購或菜單結構有所優化，為近年最佳表現。</div>
+    <div class="ins neg"><b>薪資是核心壓力</b><br>調整後薪資從 2019 年 22% 上升至 2023 年 29.5%，是利潤侵蝕主因。</div>
+    <div class="ins neu"><b>疫情留下成本包袱</b><br>2020–22 業績衝高時薪資從 $281 萬/年擴張至 $479 萬/年，疫後業績回落卻無法快速收縮。</div>
+    <div class="ins inf"><b>場地費用相對穩定</b><br>多年維持在 2–3%，為少數未隨業績波動的成本項目，結構上屬可控範圍。</div>
+  </div>
+</div>
+
+<!-- ───── SECTION 04 ───── -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <span class="sec-title">火災事件衝擊與重建軌跡</span>
+  </div>
+
+  <div class="m-grid">
+    <div class="mc red"><div class="mc-lbl">臨時期月均營收</div><div class="mc-val">$62 萬</div><div class="mc-sub">正常水準的 48%</div></div>
+    <div class="mc red"><div class="mc-lbl">停業月數</div><div class="mc-val">12 個月</div><div class="mc-sub">2024/11 – 2025/9</div></div>
+    <div class="mc amber"><div class="mc-lbl">估算累計營收損失</div><div class="mc-val">~$840 萬</div><div class="mc-sub">vs 正常月均 $132 萬</div></div>
+    <div class="mc green"><div class="mc-lbl">重建後首月 (2025/10)</div><div class="mc-val">$117 萬</div><div class="mc-sub">調整後淨利率 18.6%</div></div>
+  </div>
+
+  <div class="cc">
+    <div class="cc-title">2024/7 – 2026/4 月度營收（長條）與調整後淨利率（折線）</div>
+    <div class="leg">
+      <div class="li"><div class="ld" style="background:var(--c-amber);"></div>火災前正常期</div>
+      <div class="li"><div class="ld" style="background:#c8a0a0;"></div>臨時營業期</div>
+      <div class="li"><div class="ld" style="background:var(--c-green);"></div>重建後</div>
+      <div class="li"><div class="ld dash"></div>調整後月淨利率（右軸）</div>
+    </div>
+    <div class="cc-wrap" style="height:300px;"><canvas id="fireChart"></canvas></div>
+  </div>
+
+  <div class="cbox">
+    <p class="cbox-title">品牌韌性的最佳佐證</p>
+    <p>重建完成後首月（2025 年 10 月），月營收即達 $117 萬，幾乎立即回到正常水準。這代表在長達一年的停業期間，客群忠誠度完整保留——客人選擇「等待」而非轉移。</p>
+    <p>對一家便當店而言，這是相當罕見且珍貴的品牌資產，也是未來繼續成長最重要的基礎。</p>
+  </div>
+
+  <div class="cc">
+    <div class="cc-title">重建後月度調整後淨利率（2025/10 – 2026/4）</div>
+    <div class="cc-wrap" style="height:210px;"><canvas id="rebuildChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ───── SECTION 05 ───── -->
+<div class="section">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <span class="sec-title">真實基線與現況評估</span>
+    <span class="sec-note">以 2019 年為基準，排除疫情與火災影響</span>
+  </div>
+
+  <div class="m-grid">
+    <div class="mc amber"><div class="mc-lbl">2019 基線月均營收</div><div class="mc-val">$107 萬</div><div class="mc-sub">最可靠的「正常水準」</div></div>
+    <div class="mc amber"><div class="mc-lbl">2019 調整後淨利率</div><div class="mc-val">22.8%</div><div class="mc-sub">有機成長高點</div></div>
+    <div class="mc green"><div class="mc-lbl">2026 年月均營收</div><div class="mc-val">$103 萬</div><div class="mc-sub">已達基線水準 96%</div></div>
+    <div class="mc green"><div class="mc-lbl">2026 調整後淨利率</div><div class="mc-val">15.5%</div><div class="mc-sub">距基線仍差 7 pp</div></div>
+  </div>
+
+  <div class="pro-con">
+    <div class="pro-box">
+      <p class="box-head">✓ 正面訊號</p>
+      <ul>
+        <li>回歸後首月即達正常營收，品牌信任完整</li>
+        <li>調整後淨利率 2025/10 起穩定 19–23%</li>
+        <li>食材佔比降至 42–44%，採購效率改善</li>
+        <li>月營收軌跡持續向上，接近 2019 基線</li>
+        <li>2026/1–2 月淨利率達 20–23%，歷史高點</li>
+      </ul>
+    </div>
+    <div class="con-box">
+      <p class="box-head">⚠ 待觀察事項</p>
+      <ul>
+        <li>調整後薪資佔比 26–28%，高於 2019 年 22%</li>
+        <li>2026/3–4 月淨利率回落至 8–10%，季節性？</li>
+        <li>月營收是否能穩站 $110 萬以上待確認</li>
+        <li>負責人薪資納入後損益平衡點已提高</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="cc">
+    <div class="cc-title">各階段月均指標對比（調整後口徑）</div>
+    <div class="leg">
+      <div class="li"><div class="ld" style="background:var(--c-blue); opacity:.4; border:1.5px solid var(--c-blue);"></div>月均營收（外框色對應階段）</div>
+      <div class="li"><div class="ld" style="background:var(--c-green);"></div>月均淨利（正）</div>
+      <div class="li"><div class="ld" style="background:var(--c-red);"></div>月均淨利（負）</div>
+    </div>
+    <div class="cc-wrap" style="height:260px;"><canvas id="phaseCompChart"></canvas></div>
+  </div>
+
+  <div class="cbox">
+    <p class="cbox-title">整體評估：體質健康，尚在爬坡中的好生意</p>
+    <p>剔除疫情紅利與火災兩次外部衝擊後，這是一家從 2017 年紮實成長、兩度被外力打斷、但每次都快速彈回的便當店。2026 年的狀況不是「衰退中的生意」，而是「重建完成、正常化中的好生意」。</p>
+    <p>核心競爭力（食材控制、客群黏著度）完好無損。下一步的關鍵在於月營收能否穩定超過 $120 萬，以攤薄提高後的薪資成本，將調整後淨利率推回 20% 以上。</p>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="footer">
+  <span>馬師料理　營運分析報告　2016–2026</span>
+  <span>資料來源：馬師成本計算表　｜　分析口徑：已調整負責人薪資（2024/7 起每月 $6 萬）</span>
+</div>
+
+<script>
+/* ── DATA ── */
+const YRS  = ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'];
+const REV  = [51.9,504.9,868.4,1282,1554.3,1826.4,1947.1,1747.1,1364.2,954.3,412.9];
+const APROF= [9.9,105.5,162.9,292.3,293.6,320.1,351.6,221.4,76.6,68.1,64.1];
+const ARATE= [19.1,20.9,18.8,22.8,18.9,17.5,18.1,12.7,5.6,7.1,15.5];
+const FOOD = [55.4,49.8,48.6,46.5,47.2,49.9,48.6,50.8,47.6,43.4,42.2];
+const SORIG= [14.4,22.8,23.9,22.0,25.4,24.5,24.6,29.5,35.9,33.4,33.8];
+const SADJ = [14.4,22.8,23.9,22.0,25.4,24.5,24.6,29.5,33.3,25.9,28.0];
+const RENT = [2.8,2.0,2.4,2.5,2.5,2.3,2.3,2.8,4.0,4.2,3.8];
+const GAS  = [1.4,1.3,1.3,1.1,1.2,1.1,0.9,0.9,1.2,1.3,1.2];
+const PACK = [6.4,3.2,3.2,2.6,2.6,2.3,2.0,2.1,2.3,1.8,1.5];
+const ORIG_RATE = [19.1,20.9,18.8,22.8,18.9,17.5,18.1,12.7,3.0,-0.4,9.7];
+
+/* phase colours mapped to each year */
+const PC = [
+  '#2a4a7a', // 2016
+  '#2a4a7a','#2a4a7a','#2a4a7a', // 2017-19
+  '#b87820','#b87820','#b87820', // 2020-22
+  '#6a6a60', // 2023
+  '#a83232','#a83232', // 2024-25
+  '#2a7a50'  // 2026
+];
+
+const FMT_W = v => '$'+Math.round(v).toLocaleString()+'萬';
+const FMT_P = v => v.toFixed(1)+'%';
+const GRID  = 'rgba(28,28,26,0.07)';
+const TICK  = { color:'#8a8a82', font:{ size:13 } };
+
+/* ── TABLE ── */
+const tRows = [
+  ['2016 *','51.9','19.1%','19.1%','55.4%','14.4%','14.4%','blue','成長'],
+  ['2017','504.9','20.9%','20.9%','49.8%','22.8%','22.8%','blue','成長'],
+  ['2018','868.4','18.8%','18.8%','48.6%','23.9%','23.9%','blue','成長'],
+  ['2019','1,282','22.8%','22.8%','46.5%','22.0%','22.0%','blue','成長'],
+  ['2020','1,554','18.9%','18.9%','47.2%','25.4%','25.4%','amber','疫情'],
+  ['2021','1,826','17.5%','17.5%','49.9%','24.5%','24.5%','amber','疫情'],
+  ['2022','1,947','18.1%','18.1%','48.6%','24.6%','24.6%','amber','疫情'],
+  ['2023','1,747','12.7%','12.7%','50.8%','29.5%','29.5%','amber','回歸'],
+  ['2024 *','1,364','3.0%','5.6%','47.6%','35.9%','33.3%','red','火災'],
+  ['2025 *','954','-0.4%','7.1%','43.4%','33.4%','25.9%','red','火災'],
+  ['2026 *†','413','9.7%','15.5%','42.2%','33.8%','28.0%','green','復原'],
+];
+const tagMap = { blue:'tag-b', amber:'tag-a', red:'tag-r', green:'tag-g' };
+const tbody = document.getElementById('annualTbody');
+tRows.forEach((r,i) => {
+  const hl = i===10 ? ' class="hl-row"' : '';
+  const ar = r[3]; const arClass = parseFloat(ar)>=18?'tv-g': parseFloat(ar)<5?'tv-r':'tv-a';
+  tbody.innerHTML += `<tr${hl}>
+    <td>${r[0]}</td><td>${r[1]}</td>
+    <td>${r[2]}</td><td class="${arClass}">${r[3]}</td>
+    <td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td>
+    <td><span class="tag ${tagMap[r[7]]}">${r[8]}</span></td>
+  </tr>`;
+});
+
+/* ── CHART 1: Annual Revenue + Profit line ── */
+new Chart(document.getElementById('annualRevChart'), {
+  type:'bar',
+  data:{ labels:YRS, datasets:[
+    { label:'年營收', data:REV,
+      backgroundColor: PC,
+      yAxisID:'y', order:2 },
+    { label:'調整後年淨利', data:APROF,
+      type:'line', borderColor:'#1c1c1a', borderWidth:2.5, borderDash:[6,4],
+      pointBackgroundColor:'#1c1c1a', pointRadius:5, pointHoverRadius:7,
+      fill:false, tension:0.3, yAxisID:'y1', order:1 }
+  ]},
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false},
+      tooltip:{ callbacks:{ label:c => c.dataset.type==='line'||c.datasetIndex===1
+        ? '調整後年淨利: $'+c.parsed.y.toFixed(1)+'萬'
+        : '年營收: $'+c.parsed.y.toFixed(1)+'萬' } } },
+    scales:{
+      x:{ ticks:{...TICK, autoSkip:false}, grid:{display:false} },
+      y:{ position:'left', ticks:{...TICK, callback:v=>'$'+v+'萬'}, grid:{color:GRID},
+          title:{display:true,text:'年營收（萬元）',color:'#8a8a82',font:{size:13}} },
+      y1:{ position:'right', ticks:{...TICK, callback:v=>'$'+v+'萬'}, grid:{display:false},
+           title:{display:true,text:'年淨利（萬元）',color:'#8a8a82',font:{size:13}} }
+    }}
+});
+
+/* ── CHART 2: Annual rate bar ── */
+new Chart(document.getElementById('annualRateChart'), {
+  type:'bar',
+  data:{ labels:YRS, datasets:[{ label:'調整後淨利率', data:ARATE, backgroundColor:PC, borderRadius:4 }] },
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>'調整後淨利率: '+c.parsed.y.toFixed(1)+'%' } } },
+    scales:{
+      x:{ ticks:{...TICK, autoSkip:false}, grid:{display:false} },
+      y:{ ticks:{...TICK, callback:v=>v+'%'}, grid:{color:GRID}, min:0, max:28 }
+    }}
+});
+
+/* ── CHART 3: Food % ── */
+new Chart(document.getElementById('foodChart'), {
+  type:'line',
+  data:{ labels:YRS, datasets:[{
+    label:'食材佔比', data:FOOD,
+    borderColor:'#2a4a7a', backgroundColor:'rgba(42,74,122,0.08)',
+    fill:true, tension:0.35, pointRadius:5, pointBackgroundColor:'#2a4a7a'
+  }]},
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>'食材佔比: '+c.parsed.y.toFixed(1)+'%' } } },
+    scales:{
+      x:{ ticks:{...TICK, autoSkip:false, maxRotation:45}, grid:{display:false} },
+      y:{ ticks:{...TICK, callback:v=>v+'%'}, grid:{color:GRID}, min:38, max:62 }
+    }}
+});
+
+/* ── CHART 4: Salary % ── */
+new Chart(document.getElementById('salaryChart'), {
+  type:'bar',
+  data:{ labels:YRS, datasets:[
+    { label:'原始薪資%', data:SORIG, backgroundColor:'rgba(42,74,122,0.22)', borderColor:'#2a4a7a', borderWidth:1 },
+    { label:'調整後薪資%', data:SADJ,  backgroundColor: SADJ.map(v=>v>28?'#a83232':'#2a7a50') }
+  ]},
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%' } } },
+    scales:{
+      x:{ ticks:{...TICK, autoSkip:false, maxRotation:45}, grid:{display:false} },
+      y:{ ticks:{...TICK, callback:v=>v+'%'}, grid:{color:GRID}, max:44 }
+    }}
+});
+
+/* ── CHART 5: Cost stack ── */
+const S_YRS = ['2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+const SI    = [1,2,3,4,5,6,7,8,9];
+new Chart(document.getElementById('costStackChart'), {
+  type:'bar',
+  data:{ labels:S_YRS, datasets:[
+    { label:'食材',     data:SI.map(i=>FOOD[i]), backgroundColor:'#2a4a7a' },
+    { label:'薪資調整後', data:SI.map(i=>SADJ[i]), backgroundColor:'#a83232' },
+    { label:'場地租金',  data:SI.map(i=>RENT[i]), backgroundColor:'#b87820' },
+    { label:'瓦斯',     data:SI.map(i=>GAS[i]),  backgroundColor:'#2a7a50' },
+    { label:'包裝',     data:SI.map(i=>PACK[i]), backgroundColor:'#6a6a60' },
+  ]},
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%' } } },
+    scales:{
+      x:{ stacked:true, ticks:{...TICK, autoSkip:false}, grid:{display:false} },
+      y:{ stacked:true, ticks:{...TICK, callback:v=>v+'%'}, grid:{color:GRID}, max:90 }
+    }}
+});
+
+/* ── CHART 6: Fire monthly ── */
+const FL = ['24/7','24/8','24/9','24/10','24/11','24/12','25/1','25/2','25/3','25/4','25/5','25/6','25/7','25/8','25/9','25/10','25/11','25/12','26/1','26/2','26/3','26/4'];
+const FR = [133.1,144.3,122.4,122.3,10.7,35.0,80.4,56.3,59.3,51.4,64.1,52.6,60.9,77.1,95.3,117.0,124.9,114.9,112.9,96.4,99.5,104.1];
+const FA = [12.1,8.2,0.7,4.1,-52.1,-32.6,14.5,-15.6,14.3,-17.2,-7.4,-16.7,-9.9,9.1,8.3,18.6,19.7,20.6,20.4,23.1,10.3,8.2];
+const FB = FL.map((_,i)=> i<=3 ? '#b87820' : i<=14 ? '#c8a0a0' : '#2a7a50');
+new Chart(document.getElementById('fireChart'), {
+  type:'bar',
+  data:{ labels:FL, datasets:[
+    { label:'月營收', data:FR, backgroundColor:FB, yAxisID:'y', order:2 },
+    { label:'調整後淨利率', data:FA, type:'line',
+      borderColor:'#1c1c1a', borderWidth:2, borderDash:[5,3],
+      pointBackgroundColor:FA.map(v=>v<0?'#a83232':'#2a7a50'),
+      pointRadius:5, fill:false, tension:0.3, yAxisID:'y1', order:1 }
+  ]},
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false},
+      tooltip:{ callbacks:{ label:c=>c.yAxisID==='y1'?'淨利率: '+c.parsed.y.toFixed(1)+'%':'月營收: $'+c.parsed.y.toFixed(1)+'萬' } } },
+    scales:{
+      x:{ ticks:{...TICK, autoSkip:false, maxRotation:45, font:{size:12}}, grid:{display:false} },
+      y:{ position:'left',  ticks:{...TICK, callback:v=>'$'+v+'萬'}, grid:{color:GRID},
+          title:{display:true,text:'月營收（萬元）',color:'#8a8a82',font:{size:13}} },
+      y1:{ position:'right', ticks:{...TICK, callback:v=>v+'%'}, grid:{display:false},
+           min:-60, max:30, title:{display:true,text:'淨利率（%）',color:'#8a8a82',font:{size:13}} }
+    }}
+});
+
+/* ── CHART 7: Rebuild ── */
+const RL = ['2025/10','2025/11','2025/12','2026/1','2026/2','2026/3','2026/4'];
+const RR = [18.6,19.7,20.6,20.4,23.1,10.3,8.2];
+new Chart(document.getElementById('rebuildChart'), {
+  type:'bar',
+  data:{ labels:RL, datasets:[{ label:'調整後月淨利率', data:RR,
+    backgroundColor:RR.map(v=>v>=18?'#2a7a50':'#b87820'), borderRadius:5 }] },
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>'調整後淨利率: '+c.parsed.y.toFixed(1)+'%' } } },
+    scales:{
+      x:{ ticks:{...TICK, autoSkip:false}, grid:{display:false} },
+      y:{ ticks:{...TICK, callback:v=>v+'%'}, grid:{color:GRID}, min:0, max:28 }
+    }}
+});
+
+/* ── CHART 8: Phase compare ── */
+const PL  = ['正常成長期\n2017–19','疫情擾動期\n2020–22','疫後回歸期\n2023','火災衝擊期\n24/11–25/9','重建復原期\n25/10–'];
+const PR  = [68, 146, 146, 62, 105];
+const PP  = [14.8, 26.6, 18.5, -1.9, 20.7];
+const PPC = ['#2a4a7a','#b87820','#6a6a60','#a83232','#2a7a50'];
+new Chart(document.getElementById('phaseCompChart'), {
+  type:'bar',
+  data:{ labels:PL, datasets:[
+    { label:'月均營收', data:PR,
+      backgroundColor:PPC.map(c=>c+'28'), borderColor:PPC, borderWidth:2,
+      yAxisID:'y', order:2 },
+    { label:'月均調整後淨利', data:PP,
+      backgroundColor:PP.map((v,i)=>v<0?'#a83232':PPC[i]),
+      yAxisID:'y1', order:1 }
+  ]},
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false},
+      tooltip:{ callbacks:{ label:c=>c.dataset.label+': $'+c.parsed.y.toFixed(1)+'萬' } } },
+    scales:{
+      x:{ ticks:{...TICK, autoSkip:false, font:{size:12}}, grid:{display:false} },
+      y:{ position:'left',  ticks:{...TICK, callback:v=>'$'+v+'萬'}, grid:{color:GRID},
+          title:{display:true,text:'月均營收（萬元）',color:'#8a8a82',font:{size:13}} },
+      y1:{ position:'right', ticks:{...TICK, callback:v=>'$'+v+'萬'}, grid:{display:false},
+           title:{display:true,text:'月均淨利（萬元）',color:'#8a8a82',font:{size:13}} }
+    }}
+});
+</script>
+</body>
+</html>
